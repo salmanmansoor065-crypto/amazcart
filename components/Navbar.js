@@ -22,7 +22,7 @@ export default function Navbar({ onCategoryChange, activeCategory = 'All' }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <img src="/favicon.png" alt="AmazCart" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
+              <img src="/logo.svg" alt="AmazCart" style={{ width: 32, height: 32, borderRadius: 8 }} />
               <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px' }}>
                 <span style={{ color: '#FF6B35' }}>Amaz</span>
                 <span style={{ color: '#1A1A1A' }}>Cart</span>
