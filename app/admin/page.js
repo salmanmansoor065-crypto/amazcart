@@ -297,10 +297,170 @@ export default function AdminPage() {
     </div>
 )
 
-  return (
-    <div>
-      {/* YOUR UI UNCHANGED */}
-      Admin Panel Working
+ return (
+    <div style={{minHeight:'100vh',background:'#FAFAFA',fontFamily:'sans-serif',display:'flex'}}>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={()=>setToast(null)}/>}
+      {/* SIDEBAR */}
+      <div style={{width:240,minHeight:'100vh',background:'#0D0D0D',padding:'24px 16px',position:'fixed',top:0,left:0,display:'flex',flexDirection:'column'}}>
+        <div style={{textAlign:'center',padding:'0 0 24px',borderBottom:'1px solid #222',marginBottom:'16px'}}>
+          <div style={{fontSize:28}}>🛒</div>
+          <h2 style={{color:'#fff',fontSize:18,fontWeight:900,margin:'4px 0 2px'}}>Amaz<span style={{color:'#FF2D78'}}>Cart</span></h2>
+          <p style={{color:'#555',fontSize:11,margin:0}}>Admin Panel</p>
+        </div>
+        {[{key:'dashboard',icon:'📊',label:'Dashboard'},{key:'products',icon:'📦',label:'Products'},{key:'add',icon:'➕',label:'Add Product'},{key:'comments',icon:'💬',label:'Comments'}].map(item=>(
+          <div key={item.key} onClick={()=>{setTab(item.key);if(item.key!=='add')resetForm()}}
+            style={{display:'flex',alignItems:'center',gap:10,padding:'11px 14px',borderRadius:10,cursor:'pointer',marginBottom:4,
+              background:tab===item.key?'#FF2D78':'transparent',
+              color:tab===item.key?'#fff':'#888',fontWeight:tab===item.key?700:500,fontSize:14}}>
+            <span>{item.icon}</span><span>{item.label}</span>
+          </div>
+        ))}
+        <div style={{marginTop:'auto'}}>
+          <div onClick={handleLogout}
+            style={{display:'flex',alignItems:'center',gap:10,padding:'11px 14px',borderRadius:10,cursor:'pointer',color:'#FF2D78',fontWeight:600,fontSize:14}}>
+            🚪 Logout
+          </div>
+        </div>
+      </div>
+      {/* MAIN */}
+      <div style={{marginLeft:240,padding:'32px',width:'100%'}}>
+        {/* DASHBOARD */}
+        {tab==='dashboard'&&(
+          <div>
+            <h1 style={{fontSize:26,fontWeight:900,color:'#0D0D0D',marginBottom:8}}>Dashboard</h1>
+            <p style={{color:'#888',marginBottom:28}}>Welcome back, Admin!</p>
+            {loading?<p>Loading...</p>:(
+              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:32}}>
+                <div style={{background:'#fff',borderRadius:14,padding:'20px 24px',border:'1px solid #FFD6E7',boxShadow:'0 2px 8px rgba(255,45,120,0.08)'}}>
+                  <p style={{fontSize:12,color:'#888',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.06em',margin:'0 0 6px'}}>Total Products</p>
+                  <p style={{fontSize:36,fontWeight:900,color:'#FF2D78',margin:0}}>{products.length}</p>
+                </div>
+                <div style={{background:'#fff',borderRadius:14,padding:'20px 24px',border:'1px solid #FFD6E7',boxShadow:'0 2px 8px rgba(255,45,120,0.08)'}}>
+                  <p style={{fontSize:12,color:'#888',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.06em',margin:'0 0 6px'}}>Comments</p>
+                  <p style={{fontSize:36,fontWeight:900,color:'#0D0D0D',margin:0}}>{comments.length}</p>
+                </div>
+                <div style={{background:'#fff',borderRadius:14,padding:'20px 24px',border:'1px solid #FFD6E7',boxShadow:'0 2px 8px rgba(255,45,120,0.08)'}}>
+                  <p style={{fontSize:12,color:'#888',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.06em',margin:'0 0 6px'}}>Featured</p>
+                  <p style={{fontSize:36,fontWeight:900,color:'#0D0D0D',margin:0}}>{products.filter(p=>p.featured).length}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* PRODUCTS */}
+        {tab==='products'&&(
+          <div>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+              <h1 style={{fontSize:26,fontWeight:900,color:'#0D0D0D',margin:0}}>Products</h1>
+              <button onClick={()=>setTab('add')} style={{background:'#FF2D78',color:'#fff',border:'none',borderRadius:10,padding:'10px 20px',fontWeight:700,cursor:'pointer',fontSize:14}}>+ Add Product</button>
+            </div>
+            <input placeholder="🔍 Search products..." value={searchQ} onChange={e=>setSearchQ(e.target.value)}
+              style={{width:'100%',padding:'10px 16px',borderRadius:10,border:'2px solid #FFD6E7',marginBottom:16,fontSize:14,boxSizing:'border-box',outline:'none'}}/>
+            {loading?<p>Loading...</p>:(
+              <div style={{background:'#fff',borderRadius:14,overflow:'hidden',boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid #FFD6E7'}}>
+                <table style={{width:'100%',borderCollapse:'collapse'}}>
+                  <thead>
+                    <tr style={{background:'#FFF0F5'}}>
+                      {['Image','Name','Category','Featured','Actions'].map(h=>(
+                        <th key={h} style={{padding:'12px 16px',textAlign:'left',fontSize:11,fontWeight:700,color:'#FF2D78',textTransform:'uppercase',letterSpacing:'0.06em'}}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProducts.map((p,i)=>(
+                      <tr key={p.id} style={{borderTop:'1px solid #FFF0F5',background:i%2===0?'#fff':'#FAFAFA'}}>
+                        <td style={{padding:'12px 16px'}}>
+                          {p.image_url?<img src={p.image_url} alt={p.name} style={{width:44,height:44,objectFit:'cover',borderRadius:8,border:'2px solid #FFD6E7'}}/>
+                            :<div style={{width:44,height:44,background:'#FFF0F5',borderRadius:8,border:'2px solid #FFD6E7'}}/>}
+                        </td>
+                        <td style={{padding:'12px 16px',fontWeight:600,fontSize:14,color:'#0D0D0D'}}>{p.name}</td>
+                        <td style={{padding:'12px 16px'}}>
+                          <span style={{background:'#FFF0F5',color:'#FF2D78',padding:'4px 10px',borderRadius:20,fontSize:12,fontWeight:700}}>{p.category}</span>
+                        </td>
+                        <td style={{padding:'12px 16px'}}>{p.featured?'⭐ Yes':'—'}</td>
+                        <td style={{padding:'12px 16px'}}>
+                          <button onClick={()=>startEdit(p)} style={{background:'#FFF0F5',color:'#FF2D78',border:'none',borderRadius:8,padding:'6px 14px',fontWeight:700,cursor:'pointer',marginRight:8,fontSize:13}}>Edit</button>
+                          <button onClick={()=>handleDelete(p.id)} style={{background:'#0D0D0D',color:'#fff',border:'none',borderRadius:8,padding:'6px 14px',fontWeight:700,cursor:'pointer',fontSize:13}}>Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredProducts.length===0&&<tr><td colSpan={5} style={{padding:32,textAlign:'center',color:'#888'}}>No products found</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+        {/* ADD/EDIT */}
+        {tab==='add'&&(
+          <div>
+            <h1 style={{fontSize:26,fontWeight:900,color:'#0D0D0D',marginBottom:24}}>{editingId?'Edit Product':'Add Product'}</h1>
+            <div style={{background:'#fff',borderRadius:14,padding:32,boxShadow:'0 2px 8px rgba(0,0,0,0.06)',maxWidth:580,border:'1px solid #FFD6E7'}}>
+              <form onSubmit={handleSave}>
+                {[{label:'Product Name *',name:'name',placeholder:'Enter product name'},{label:'Affiliate Link *',name:'affiliate_link',placeholder:'https://...'}].map(f=>(
+                  <div key={f.name} style={{marginBottom:16}}>
+                    <label style={{fontSize:13,fontWeight:700,color:'#0D0D0D',display:'block',marginBottom:6}}>{f.label}</label>
+                    <input name={f.name} value={form[f.name]} onChange={handleFormChange} placeholder={f.placeholder}
+                      style={{width:'100%',padding:'11px 14px',borderRadius:10,border:'2px solid #FFD6E7',fontSize:14,boxSizing:'border-box',outline:'none'}}
+                      onFocus={e=>e.target.style.border='2px solid #FF2D78'}
+                      onBlur={e=>e.target.style.border='2px solid #FFD6E7'}/>
+                  </div>
+                ))}
+                <div style={{marginBottom:16}}>
+                  <label style={{fontSize:13,fontWeight:700,color:'#0D0D0D',display:'block',marginBottom:6}}>Description *</label>
+                  <textarea name="description" value={form.description} onChange={handleFormChange} placeholder="Enter product description" rows={4}
+                    style={{width:'100%',padding:'11px 14px',borderRadius:10,border:'2px solid #FFD6E7',fontSize:14,boxSizing:'border-box',resize:'vertical',outline:'none'}}
+                    onFocus={e=>e.target.style.border='2px solid #FF2D78'}
+                    onBlur={e=>e.target.style.border='2px solid #FFD6E7'}/>
+                </div>
+                <div style={{marginBottom:16}}>
+                  <label style={{fontSize:13,fontWeight:700,color:'#0D0D0D',display:'block',marginBottom:6}}>Category *</label>
+                  <select name="category" value={form.category} onChange={handleFormChange}
+                    style={{width:'100%',padding:'11px 14px',borderRadius:10,border:'2px solid #FFD6E7',fontSize:14,boxSizing:'border-box',outline:'none'}}>
+                    {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div style={{marginBottom:16}}>
+                  <label style={{fontSize:13,fontWeight:700,color:'#0D0D0D',display:'block',marginBottom:6}}>Product Image</label>
+                  <input type="file" accept="image/*" onChange={handleImgChange} ref={imgRef}/>
+                  {imgPreview&&<img src={imgPreview} alt="preview" style={{marginTop:10,width:100,height:100,objectFit:'cover',borderRadius:10,border:'2px solid #FFD6E7'}}/>}
+                </div>
+                <div style={{marginBottom:24,display:'flex',alignItems:'center',gap:8}}>
+                  <input type="checkbox" name="featured" checked={form.featured} onChange={handleFormChange} id="featured" style={{accentColor:'#FF2D78',width:16,height:16}}/>
+                  <label htmlFor="featured" style={{fontSize:14,fontWeight:600,color:'#0D0D0D',cursor:'pointer'}}>Featured Product ⭐</label>
+                </div>
+                <div style={{display:'flex',gap:12}}>
+                  <button type="submit" disabled={saving||uploading}
+                    style={{background:'#FF2D78',color:'#fff',border:'none',borderRadius:10,padding:'12px 28px',fontWeight:700,cursor:'pointer',fontSize:15}}>
+                    {saving?'Saving...':uploading?'Uploading...':editingId?'Update Product':'Add Product'}
+                  </button>
+                  {editingId&&<button type="button" onClick={resetForm}
+                    style={{background:'#0D0D0D',color:'#fff',border:'none',borderRadius:10,padding:'12px 24px',fontWeight:700,cursor:'pointer'}}>Cancel</button>}
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        {/* COMMENTS */}
+        {tab==='comments'&&(
+          <div>
+            <h1 style={{fontSize:26,fontWeight:900,color:'#0D0D0D',marginBottom:24}}>Comments</h1>
+            {loading?<p>Loading...</p>:(
+              <div style={{background:'#fff',borderRadius:14,overflow:'hidden',boxShadow:'0 2px 8px rgba(0,0,0,0.06)',border:'1px solid #FFD6E7'}}>
+                {comments.length===0
+                  ?<p style={{padding:32,textAlign:'center',color:'#888'}}>No comments yet</p>
+                  :comments.map(c=>(
+                    <div key={c.id} style={{padding:'16px 24px',borderBottom:'1px solid #FFF0F5'}}>
+                      <p style={{fontWeight:700,fontSize:14,color:'#0D0D0D',margin:'0 0 4px'}}>{c.author||'Anonymous'}</p>
+                      <p style={{color:'#555',fontSize:14,margin:0}}>{c.content||c.text||c.comment}</p>
+                    </div>
+                  ))
+                }
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
