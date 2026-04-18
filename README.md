@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AmazCart — Full Stack Amazon Affiliate Site
 
 Built with **Next.js 14**, **Supabase** (database + storage), and **JWT authentication**.
@@ -157,3 +158,6 @@ amazcart/
 - All write operations (add/edit/delete product, upload image, delete comment) require a valid JWT
 - The Supabase service role key is only used server-side in API routes — never exposed to the browser
 - Image uploads are validated for file type server-side
+=======
+# amazcart
+>>>>>>> 684627e9f48639fc6c4c5e9e394dd3247b8b8907
