@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { verifyAdminToken, getTokenFromRequest } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req) {
   try {
     const token = getTokenFromRequest(req)
+
     if (!verifyAdminToken(token)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -13,13 +16,15 @@ export async function GET(req) {
       return NextResponse.json({ products: 0, comments: 0, categories: {} })
     }
 
-    const [{ count: products }, { count: comments }, { data: cats }] = await Promise.all([
-      supabaseAdmin.from('products').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('comments').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('products').select('category'),
-    ])
+    const [{ count: products }, { count: comments }, { data: cats }] =
+      await Promise.all([
+        supabaseAdmin.from('products').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('comments').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('products').select('category'),
+      ])
 
     const categoryMap = {}
+
     cats?.forEach(p => {
       if (p?.category) {
         categoryMap[p.category] = (categoryMap[p.category] || 0) + 1
@@ -31,12 +36,12 @@ export async function GET(req) {
       comments: comments || 0,
       categories: categoryMap
     })
-  } catch (err) {
+
+  } catch (e) {
     return NextResponse.json({
       products: 0,
       comments: 0,
-      categories: {},
-      error: 'stats failed safely'
+      categories: {}
     })
   }
 }
