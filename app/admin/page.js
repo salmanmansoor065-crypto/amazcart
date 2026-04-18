@@ -243,9 +243,59 @@ export default function AdminPage() {
     p.category.toLowerCase().includes(searchQ.toLowerCase())
   )
 
-  if (!authed) return (
-    <div>Login UI (unchanged)</div>
-  )
+ if (!authed) return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', background: '#F7F7F7'
+    }}>
+      <div style={{
+        background: '#fff', padding: '40px', borderRadius: '16px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '400px'
+      }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '8px', fontSize: '24px', fontWeight: 800 }}>
+          Admin Login
+        </h2>
+        <p style={{ textAlign: 'center', color: '#888', marginBottom: '24px', fontSize: '14px' }}>
+          Enter your password to continue
+        </p>
+
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#444' }}>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Enter admin password"
+              style={{
+                width: '100%', padding: '12px', borderRadius: '8px',
+                border: '1px solid #DDD', marginTop: '6px',
+                fontSize: '15px', outline: 'none', boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {loginError && (
+            <p style={{ color: 'red', fontSize: '13px', marginBottom: '12px' }}>
+              {loginError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loginLoading}
+            style={{
+              width: '100%', padding: '12px', background: '#FF6B35',
+              color: '#fff', border: 'none', borderRadius: '8px',
+              fontSize: '16px', fontWeight: 700, cursor: 'pointer'
+            }}
+          >
+            {loginLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      </div>
+    </div>
+)
 
   return (
     <div>
